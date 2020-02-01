@@ -2,11 +2,8 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>makehuman-js example Web UI</title>
-        <link rel="stylesheet" href="css/style.css">
     </head>
     <body>
-<div id="info"><a href="github.com/makehuman-js/makehuman-js">makehuman-js</a> example Web UI</div>
 <div id="stats"></div>
 <div id="nav"></div>
 <div id="container"></div>
@@ -29,7 +26,8 @@
     // load some json data first
     var loadUrls = {
         modeling_sliders: 'node_modules/makehuman-data/src/json/sliders/modeling_sliders.json',
-        resources: 'node_modules/makehuman-data/public/data/resources.json'
+        resources: 'node_modules/makehuman-data/public/data/resources.json',
+        language: 'docs/chinese_china.json',
     }
     var loader = new THREE.XHRLoader();
     Promise.all(
@@ -51,7 +49,7 @@
     .then(() => {
         // start the app
         resources.baseUrl = "node_modules/makehuman-data/public/data/"
-        app = new App(resources, modeling_sliders)
+        app = new App(resources, modeling_sliders, language)
         app.init()
         app.animate()
     })

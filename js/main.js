@@ -9,7 +9,7 @@ var App = function (makehuman, dat, _, THREE, Detector, Nanobar, Stats) {
      * @param       {object} modeling_sliders - list of modeling_sliders from makehuman-data
      * @constructor
      */
-    function App(resources, modeling_sliders) {
+    function App(resources, modeling_sliders, language) {
 
         this.SCREEN_WIDTH = window.innerWidth / 3 * 2;
         this.SCREEN_HEIGHT = window.innerHeight / 3 * 2;
@@ -37,6 +37,7 @@ var App = function (makehuman, dat, _, THREE, Detector, Nanobar, Stats) {
 
         this.resources = resources
         this.modeling_sliders = modeling_sliders
+        this.language = language
     }
 
     App.prototype.init = function init() {
@@ -334,13 +335,14 @@ var App = function (makehuman, dat, _, THREE, Detector, Nanobar, Stats) {
         var self = this;
         this.proxyConfig = {}
         var proxiesbyGroup = _.groupBy(this.human.proxies.children, p => p.group)
-        var proxyGui = this.gui.addFolder("Wardrobe");
+        var proxyGui = this.gui.addFolder(this.app.language["Wardrobe"]);
         var groups = Object.keys(proxiesbyGroup)
         groups.map(group => {
             var proxyNames = proxiesbyGroup[group].map(p => p.name)
             if (group == "clothes") {
                 // dat-gui checkbox fields
-                var proxyGroupGui = proxyGui.addFolder(group);
+                var groupName = self.app.language[group] ? self.app.language[group] : group
+                var proxyGroupGui = proxyGui.addFolder(groupName);
                 this.proxyConfig[group] = proxiesbyGroup[group].reduce((o, p) => {
                     o[p.name] = p.visible;
                     return o
@@ -350,16 +352,19 @@ var App = function (makehuman, dat, _, THREE, Detector, Nanobar, Stats) {
                         self.human.proxies.toggleProxy(proxyName, state)
                     })
                 })
-            } else {
+            } else if (group == "genitals" || group == "teeth" || group == "tongue") {
+            } 
+            else {
                 // dat-gui select field
+                var groupName = self.app.language[group] ? self.app.language[group] : group
                 var activeProxy = proxiesbyGroup[group].find(p => p.visible)
-                this.proxyConfig[group] = activeProxy ? activeProxy.name : ''
-                proxyGui.add(this.proxyConfig, group, proxyNames).onChange(function (proxyName) {
+                this.proxyConfig[groupName] = activeProxy ? activeProxy.name : ''
+                proxyGui.add(this.proxyConfig, groupName, proxyNames).onChange(function (proxyName) {
                     proxiesbyGroup[group].map(proxy => self.human.proxies.toggleProxy(proxy.name, false))
                     self.human.proxies.toggleProxy(proxyName, true)
                 });
             }
-            proxiesbyGroup[group]
+            // proxiesbyGroup[group]
         })
         this.gui.remember(this.poseConfig);
         proxyGui.open()
